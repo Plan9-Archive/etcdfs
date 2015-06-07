@@ -25,7 +25,7 @@ struct EtcdNode
 	int 		ttl;
 	EtcdNode	**nodes;
 	int 		nnodes;
-	int 		modifiedidx;
+	int			modifiedidx;
 	int			createdidx;
 };
 
