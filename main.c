@@ -9,7 +9,7 @@
 
 enum
 {
-	DEBUG	= 1,
+	DEBUG	= 0,
 };
 
 #define dbg(fmt, ...) if(DEBUG) fprint(2, fmt, __VA_ARGS__)
@@ -481,21 +481,45 @@ Srv fs =
 };
 
 void
+usage(void)
+{
+	fprint(2, "usage: %s [-D] [-m mntpt] [-s service] -e endpoint\n", argv0);
+	exits("usage");
+}
+
+void
 main(int argc, char *argv[])
 {
 	int i;
+	char *srvpoint, *mntpoint;
 	EtcdNode *r, *e;
 
+	quotefmtinstall();
+
+	srvpoint = "/srv/etcd";
+	mntpoint = "/n/etcd";
+
 	ARGBEGIN{
-	case 'e':
-		endpoint = ARGF();
+	case 'D':
+		chatty9p++;
 		break;
+	case 'm':
+		mntpoint = EARGF(usage());
+		break;
+	case 's':
+		srvpoint = EARGF(usage());
+		break;
+	case 'e':
+		endpoint = EARGF(usage());
+		break;
+	default:
+		usage();
 	}ARGEND
 
 	if(endpoint == nil)
 		sysfatal("missing endpoint");
 
-	postmountsrv(&fs, nil, "/n/etcd", MREPL | MCREATE);
+	postmountsrv(&fs, srvpoint, mntpoint, MREPL | MCREATE);
 
 	exits(nil);
 }
