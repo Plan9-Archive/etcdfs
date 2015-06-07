@@ -348,7 +348,7 @@ static int dirgen(int i, Dir *d, void *v)
 	d->uid = estrdup9p("etcd");
 	d->gid = estrdup9p("etcd");
 	d->mode = 0777;
-	d->atime = d->mtime = 0; //time(nil);
+	d->atime = d->mtime = 0;
 
 	if(i >= n->nnodes)
 		return -1;
@@ -448,7 +448,7 @@ fsstat(Req *r)
 	memset(d, 0, sizeof(*d));
 	d->uid = estrdup9p("etcd");
 	d->gid = estrdup9p("etcd");
-	d->atime = d->mtime = 0; //time(nil);
+	d->atime = d->mtime = 0;
 
 	d->mode = 0777;
 
@@ -459,8 +459,10 @@ fsstat(Req *r)
 		d->name = estrdup9p(unslash(a->path));
 	}
 
-	if(a->node != nil && a->node->dir)
+	if(a->node->dir)
 		d->mode |= DMDIR;
+	else
+		d->length = strlen(a->node->value);
 
 	aux2qid(a, &d->qid);
 
