@@ -496,7 +496,7 @@ main(int argc, char *argv[])
 
 	quotefmtinstall();
 
-	srvpoint = "/srv/etcd";
+	srvpoint = "etcd";
 	mntpoint = "/n/etcd";
 
 	ARGBEGIN{
