@@ -433,6 +433,41 @@ fswrite(Req *r)
 void
 fscreate(Req *r)
 {
+	char path[256], body[64];
+	EtcdNode *n;
+	Aux *a, tmp;
+
+	path[0] = 0;
+	body[0] = 0;
+
+	a = r->fid->aux;
+
+	if(r->ifcall.perm & DMDIR)
+		strcat(body, "dir=true");
+	else
+		strcat(body, "value=");
+
+	if(strcmp(a->path, "/") == 0)
+		snprint(path, sizeof(path), "/%s", r->ifcall.name);
+	else
+		snprint(path, sizeof(path), "%s/%s", a->path, r->ifcall.name);
+
+	dbg("fscreate %s\n", path);
+
+	n = etcddo(endpoint, path, nil, body);
+	if(n == nil){
+		respond(r, "cant create");
+		return;
+	}
+
+	tmp.path = path;
+	tmp.node = n;
+
+	aux2qid(a, &r->fid->qid);
+	r->ofcall.qid = r->fid->qid;
+
+	etcdnodefree(n);
+
 	respond(r, nil);
 }
 
